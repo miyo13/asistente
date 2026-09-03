@@ -609,21 +609,28 @@ function handleSpecialIntents(textoNormalizado) {
     }
   }
 
-  // Matemáticas: "cuanto es 5 mas 3", "cuanto es 1.250,5 por 2", "cuanto es 3000000 entre 4"
-  if (/cuanto (es|son|da)|calcula/.test(textoNormalizado)) {
-    let expresion = textoNormalizado
-      .replace(/mas/g, "+")
-      .replace(/menos/g, "-")
-      .replace(/por/g, "*")
-      .replace(/entre|dividido/g, "/");
+  // Matemáticas: funciona con frase ("cuanto es 5 mas 3", "calcula 10 por 2")
+  // y también si se escribe la operación directamente ("34+56", "10 x 2")
+  let expresion = textoNormalizado
+    .replace(/mas/g, "+")
+    .replace(/menos/g, "-")
+    .replace(/dividido|entre/g, "/")
+    .replace(/por/g, "*")
+    .replace(/[x×]/g, "*")
+    .replace(/÷/g, "/");
 
-    // acepta enteros o decimales de CUALQUIER tamaño, con "." o "," como
-    // separador. Si un número trae varios separadores (ej 1.234.567,89),
-    // el último se interpreta como decimal y los anteriores como miles.
-    const patronNumero = "-?\\d+(?:[.,]\\d+)*";
-    const regexOperacion = new RegExp(`(${patronNumero})\\s*([\\+\\-\\*\\/])\\s*(${patronNumero})`);
+  // acepta enteros o decimales de CUALQUIER tamaño, con "." o "," como
+  // separador. Si un número trae varios separadores (ej 1.234.567,89),
+  // el último se interpreta como decimal y los anteriores como miles.
+  const patronNumero = "-?\\d+(?:[.,]\\d+)*";
+  const regexOperacion = new RegExp(`(${patronNumero})\\s*([\\+\\-\\*\\/])\\s*(${patronNumero})`);
+  const regexExpresionCompleta = new RegExp(`^${patronNumero}\\s*[\\+\\-\\*\\/]\\s*${patronNumero}$`);
+
+  const esConsultaExplicita = /cuanto (es|son|da)|calcula/.test(textoNormalizado);
+  const esOperacionDirecta = regexExpresionCompleta.test(expresion.trim());
+
+  if (esConsultaExplicita || esOperacionDirecta) {
     const match = expresion.match(regexOperacion);
-
     if (match) {
       const a = limpiarNumero(match[1]);
       const op = match[2];
@@ -644,7 +651,9 @@ function handleSpecialIntents(textoNormalizado) {
       resultado = Math.round(resultado * 1e6) / 1e6;
       return `El resultado es ${resultado}.`;
     }
-    return "Dime la operación con dos números, por ejemplo: '¿cuánto es 8 más 4?'";
+    if (esConsultaExplicita) {
+      return "Dime la operación con dos números, por ejemplo: '¿cuánto es 8 más 4?'";
+    }
   }
 
   return null;
