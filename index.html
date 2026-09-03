@@ -380,7 +380,10 @@
         <span class="name">DSV bot</span>
         <span class="tag">Asistente</span>
       </div>
-      <div class="pill" id="voicePill"><span class="dot"></span><span id="voicePillText">Voz lista</span></div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div class="pill" id="voicePill"><span class="dot"></span><span id="voicePillText">Voz lista</span></div>
+        <div class="pill" id="langPill" style="cursor:pointer;" title="Cambiar idioma de reconocimiento de voz">🌐 ES</div>
+      </div>
     </header>
 
     <div class="stage-wrap">
@@ -559,7 +562,7 @@ const KB = [
   },
   {
     palabras: ["que puedes hacer", "que sabes hacer", "para que sirves", "ayuda", "que haces"],
-    respuestas: ["Puedo saludarte, contar chistes, hacer cuentas sencillas, decirte capitales de países, hablar de robótica y Python, y conversar sobre temas básicos. ¡Pregúntame algo!"]
+    respuestas: ["Puedo saludarte, contar chistes, hacer cuentas (incluyendo raíces cuadradas), decirte capitales de países o de continentes, hablar de robótica y Python, y también entiendo inglés. ¡Pregúntame algo!"]
   },
   {
     palabras: ["chiste", "cuentame algo gracioso", "hazme reir"],
@@ -658,6 +661,28 @@ const KB = [
   {
     palabras: ["que es un bit", "que es un byte"],
     respuestas: ["Un bit es la unidad más pequeña de información en una computadora: solo puede ser 0 o 1. Un byte son 8 bits juntos, suficientes para representar, por ejemplo, una letra."]
+  },
+
+  // ---- BLOQUE DE MATEMÁTICAS ----
+  {
+    palabras: ["que es pi", "valor de pi", "numero pi", "cual es el numero pi"],
+    respuestas: ["El número π (pi) es aproximadamente 3.14159265. Es la relación entre la circunferencia de un círculo y su diámetro: siempre es la misma para cualquier círculo."]
+  },
+  {
+    palabras: ["que es el numero e", "numero de euler"],
+    respuestas: ["El número e (número de Euler) es aproximadamente 2.71828. Aparece mucho en matemáticas, sobre todo en crecimiento exponencial."]
+  },
+  {
+    palabras: ["que es un numero primo"],
+    respuestas: ["Un número primo es un número mayor que 1 que solo se puede dividir exactamente entre 1 y él mismo. Por ejemplo: 2, 3, 5, 7, 11."]
+  },
+  {
+    palabras: ["que es un numero par"],
+    respuestas: ["Un número par es un número que se puede dividir exactamente entre 2, sin dejar residuo. Por ejemplo: 2, 4, 6, 8."]
+  },
+  {
+    palabras: ["que es un numero impar"],
+    respuestas: ["Un número impar es un número que NO se puede dividir exactamente entre 2. Por ejemplo: 1, 3, 5, 7."]
   }
 ];
 
@@ -689,6 +714,166 @@ const RESPUESTAS_SIN_COINCIDENCIA = [
   "No estoy segura de entender eso todavía. ¿Puedes decirlo de otra forma?",
   "Aún no tengo una respuesta para eso, pero puedes enseñarme agregándola a mi base de conocimiento.",
   "Esa pregunta no la tengo guardada. Intenta con algo como '¿qué puedes hacer?'"
+];
+
+// Listas de países/capitales por continente, para "dime N capitales de <continente>"
+const CAPITALES_POR_REGION = {
+  asia: [
+    { pais: "Japón", capital: "Tokio" }, { pais: "China", capital: "Pekín" },
+    { pais: "India", capital: "Nueva Delhi" }, { pais: "Corea del Sur", capital: "Seúl" },
+    { pais: "Tailandia", capital: "Bangkok" }, { pais: "Vietnam", capital: "Hanói" },
+    { pais: "Indonesia", capital: "Yakarta" }, { pais: "Filipinas", capital: "Manila" }
+  ],
+  europa: [
+    { pais: "Francia", capital: "París" }, { pais: "Italia", capital: "Roma" },
+    { pais: "España", capital: "Madrid" }, { pais: "Alemania", capital: "Berlín" },
+    { pais: "Portugal", capital: "Lisboa" }, { pais: "Reino Unido", capital: "Londres" },
+    { pais: "Grecia", capital: "Atenas" }, { pais: "Países Bajos", capital: "Ámsterdam" }
+  ],
+  america: [
+    { pais: "Colombia", capital: "Bogotá" }, { pais: "México", capital: "Ciudad de México" },
+    { pais: "Argentina", capital: "Buenos Aires" }, { pais: "Chile", capital: "Santiago" },
+    { pais: "Perú", capital: "Lima" }, { pais: "Canadá", capital: "Ottawa" },
+    { pais: "Estados Unidos", capital: "Washington D.C." }, { pais: "Brasil", capital: "Brasilia" }
+  ],
+  africa: [
+    { pais: "Egipto", capital: "El Cairo" }, { pais: "Nigeria", capital: "Abuya" },
+    { pais: "Sudáfrica", capital: "Pretoria" }, { pais: "Kenia", capital: "Nairobi" },
+    { pais: "Marruecos", capital: "Rabat" }, { pais: "Etiopía", capital: "Adís Abeba" },
+    { pais: "Ghana", capital: "Accra" }, { pais: "Argelia", capital: "Argel" }
+  ],
+  oceania: [
+    { pais: "Australia", capital: "Canberra" }, { pais: "Nueva Zelanda", capital: "Wellington" },
+    { pais: "Fiyi", capital: "Suva" }, { pais: "Papúa Nueva Guinea", capital: "Port Moresby" },
+    { pais: "Samoa", capital: "Apia" }
+  ]
+};
+const NOMBRE_REGION = { asia: "Asia", europa: "Europa", america: "América", africa: "África", oceania: "Oceanía" };
+
+// ---------------------------------------------------------------------
+// 2b) VERSIÓN EN INGLÉS — se usa automáticamente cuando se detecta que
+//     la pregunta está en inglés (ver detectarIdioma() más abajo).
+// ---------------------------------------------------------------------
+const CAPITALES_EN = {
+  "colombia": "Bogotá", "mexico": "Mexico City", "argentina": "Buenos Aires",
+  "chile": "Santiago", "peru": "Lima", "venezuela": "Caracas", "ecuador": "Quito",
+  "bolivia": "Sucre", "paraguay": "Asunción", "uruguay": "Montevideo",
+  "spain": "Madrid", "france": "Paris", "italy": "Rome", "germany": "Berlin",
+  "portugal": "Lisbon", "brazil": "Brasilia", "united states": "Washington D.C.",
+  "japan": "Tokyo", "china": "Beijing", "canada": "Ottawa"
+};
+
+const CAPITALES_POR_REGION_EN = {
+  asia: [
+    { country: "Japan", capital: "Tokyo" }, { country: "China", capital: "Beijing" },
+    { country: "India", capital: "New Delhi" }, { country: "South Korea", capital: "Seoul" },
+    { country: "Thailand", capital: "Bangkok" }, { country: "Vietnam", capital: "Hanoi" },
+    { country: "Indonesia", capital: "Jakarta" }, { country: "Philippines", capital: "Manila" }
+  ],
+  europe: [
+    { country: "France", capital: "Paris" }, { country: "Italy", capital: "Rome" },
+    { country: "Spain", capital: "Madrid" }, { country: "Germany", capital: "Berlin" },
+    { country: "Portugal", capital: "Lisbon" }, { country: "United Kingdom", capital: "London" },
+    { country: "Greece", capital: "Athens" }, { country: "Netherlands", capital: "Amsterdam" }
+  ],
+  america: [
+    { country: "Colombia", capital: "Bogotá" }, { country: "Mexico", capital: "Mexico City" },
+    { country: "Argentina", capital: "Buenos Aires" }, { country: "Chile", capital: "Santiago" },
+    { country: "Peru", capital: "Lima" }, { country: "Canada", capital: "Ottawa" },
+    { country: "United States", capital: "Washington D.C." }, { country: "Brazil", capital: "Brasilia" }
+  ],
+  africa: [
+    { country: "Egypt", capital: "Cairo" }, { country: "Nigeria", capital: "Abuja" },
+    { country: "South Africa", capital: "Pretoria" }, { country: "Kenya", capital: "Nairobi" },
+    { country: "Morocco", capital: "Rabat" }, { country: "Ethiopia", capital: "Addis Ababa" },
+    { country: "Ghana", capital: "Accra" }, { country: "Algeria", capital: "Algiers" }
+  ],
+  oceania: [
+    { country: "Australia", capital: "Canberra" }, { country: "New Zealand", capital: "Wellington" },
+    { country: "Fiji", capital: "Suva" }, { country: "Papua New Guinea", capital: "Port Moresby" },
+    { country: "Samoa", capital: "Apia" }
+  ]
+};
+const REGION_NAME_EN = { asia: "Asia", europe: "Europe", america: "America", africa: "Africa", oceania: "Oceania" };
+
+const KB_EN = [
+  { palabras: ["hello", "hi", "hey", "good morning", "good afternoon", "good evening"],
+    respuestas: ["Hello! How are you?", "Hi there! Great to talk to you.", "Hey! What can I help you with?"] },
+  { palabras: ["how are you", "how's it going", "are you ok"],
+    respuestas: ["I'm doing great, thanks for asking! How about you?", "Running perfectly, ready to help!"] },
+  { palabras: ["what is your name", "what's your name", "who are you", "your name"],
+    respuestas: [`My name is ${CONFIG.nombre}. I'm a virtual assistant made to listen to you and help you.`] },
+  { palabras: ["who made you", "who created you", "who built you", "who programmed you"],
+    respuestas: ["I was created by Sofia Meneses, Victoria Mancera and Dana Casallas."] },
+  { palabras: ["what can you do", "what do you know", "what can you help with"],
+    respuestas: ["I can greet you, tell jokes, do math (including square roots), tell you capitals of countries or continents, talk about robotics and Python, and I also understand Spanish. Ask me something!"] },
+  { palabras: ["joke", "tell me a joke", "make me laugh"],
+    respuestas: [
+      "Why don't computers ever get cold? Because they have Windows.",
+      "What did one bit say to the other? See you at the byte.",
+      "Why was the math book sad? It had too many problems."
+    ] },
+  { palabras: ["thank you", "thanks a lot", "thanks"],
+    respuestas: ["You're welcome!", "That's what I'm here for.", "Anytime!"] },
+  { palabras: ["goodbye", "bye", "see you later", "see you"],
+    respuestas: ["See you soon!", "Bye! I'll be here whenever you need me.", "Goodbye! Nice talking to you."] },
+
+  { palabras: ["what time is it", "what's the time"], respuestas: [] },
+  { palabras: ["what day is it", "today's date", "what is the date"], respuestas: [] },
+  { palabras: ["capital of"], respuestas: [] },
+  { palabras: ["how much is", "calculate"], respuestas: [] },
+
+  // ---- MATH ----
+  { palabras: ["what is pi", "value of pi", "what's pi"],
+    respuestas: ["The number π (pi) is approximately 3.14159265. It's the ratio between a circle's circumference and its diameter — always the same for any circle."] },
+  { palabras: ["what is e", "euler's number"],
+    respuestas: ["The number e (Euler's number) is approximately 2.71828. It shows up a lot in math, especially in exponential growth."] },
+  { palabras: ["what is a prime number"],
+    respuestas: ["A prime number is a number greater than 1 that can only be divided evenly by 1 and itself. For example: 2, 3, 5, 7, 11."] },
+  { palabras: ["what is an even number"],
+    respuestas: ["An even number is a number that can be divided evenly by 2, with no remainder. For example: 2, 4, 6, 8."] },
+  { palabras: ["what is an odd number"],
+    respuestas: ["An odd number is a number that CANNOT be divided evenly by 2. For example: 1, 3, 5, 7."] },
+
+  // ---- ROBOTICS, PYTHON & TECHNOLOGY ----
+  { palabras: ["what is a robot"],
+    respuestas: ["A robot is a machine that can sense its environment with sensors, make decisions using a program, and act on the world with motors or other moving parts."] },
+  { palabras: ["what is robotics"],
+    respuestas: ["Robotics is the field that studies how to design, build and program robots, combining mechanics, electronics and programming."] },
+  { palabras: ["what is a sensor"],
+    respuestas: ["A sensor is a component that detects information from the environment, like light, distance, temperature or sound, and turns it into a signal the robot can understand."] },
+  { palabras: ["what is an actuator"],
+    respuestas: ["An actuator is the part of a robot that produces movement or action, like a motor, a servo, or a speaker. It's the opposite of a sensor: sensors perceive, actuators act."] },
+  { palabras: ["what is an algorithm"],
+    respuestas: ["An algorithm is an ordered sequence of steps to solve a problem or complete a task, like a recipe but for a computer."] },
+  { palabras: ["what is python"],
+    respuestas: ["Python is an easy-to-read programming language, widely used to learn programming, data science and artificial intelligence."] },
+  { palabras: ["who invented python", "who created python"],
+    respuestas: ["Python was created by Guido van Rossum and first released in 1991."] },
+  { palabras: ["what is a variable"],
+    respuestas: ["In programming, a variable is a named space where you store a piece of data, like a number or text, so you can use or change it later."] },
+  { palabras: ["what is a loop"],
+    respuestas: ["A loop is a structure that repeats a block of instructions several times, instead of writing them over and over."] },
+  { palabras: ["what is a conditional", "what is an if statement"],
+    respuestas: ["A conditional is an instruction that lets a program make decisions: 'if this is true, then do this; otherwise, do something else'."] },
+  { palabras: ["what is a function"],
+    respuestas: ["In programming, a function is a named block of code that performs a specific task and can be reused whenever you need it."] },
+  { palabras: ["what is hardware"],
+    respuestas: ["Hardware is the physical part of a computer or robot: the cables, chips, motors and sensors you can actually touch."] },
+  { palabras: ["what is software"],
+    respuestas: ["Software is the programs and instructions that tell hardware what to do. You can't touch it, but you can see it on the screen."] },
+  { palabras: ["what is a microcontroller", "what is arduino"],
+    respuestas: ["A microcontroller, like Arduino or the ESP32, is a tiny computer inside a chip used to control sensors and motors in robotics projects."] },
+  { palabras: ["what is artificial intelligence", "what is ai"],
+    respuestas: ["Artificial intelligence is a field of technology that builds programs able to learn from data and make decisions, mimicking some human abilities like recognizing images or understanding language."] },
+  { palabras: ["what is a bit", "what is a byte"],
+    respuestas: ["A bit is the smallest unit of information in a computer: it can only be 0 or 1. A byte is 8 bits together, enough to represent, for example, one letter."] }
+];
+
+const RESPUESTAS_SIN_COINCIDENCIA_EN = [
+  "I'm not sure I understand that yet. Can you say it another way?",
+  "I don't have an answer for that yet, but you can teach me by adding it to my knowledge base.",
+  "I don't have that question saved. Try something like 'what can you do?'"
 ];
 
 // ---------------------------------------------------------------------
@@ -731,44 +916,122 @@ function limpiarNumero(token) {
   return parseFloat(token);
 }
 
+// Detecta si el texto está en inglés o español, con un método simple:
+// si tiene tildes, ñ o signos ¿¡ es casi seguro español; si no, busca
+// palabras típicas del inglés. No es perfecto (es una heurística por
+// palabras clave, no un modelo de idioma real), pero funciona bien para
+// preguntas cortas escritas o dictadas por niños.
+function detectarIdioma(textoOriginal) {
+  if (/[áéíóúüñ¿¡]/i.test(textoOriginal)) return "es";
+  const texto = textoOriginal.toLowerCase();
+
+  // palabras sueltas: exigimos límite de palabra completo (\b) para no
+  // confundir, por ejemplo, "ahí" (contiene "hi") con la palabra inglesa "hi"
+  const palabrasSueltasEN = ["the", "what", "how", "who", "where", "when", "why",
+    "hello", "hi", "hey", "please", "thanks", "joke", "plus", "minus", "times", "goodbye"];
+  for (const p of palabrasSueltasEN) {
+    if (new RegExp(`\\b${p}\\b`).test(texto)) return "en";
+  }
+
+  // frases de 2+ palabras: seguras como substring (muy difícil que
+  // aparezcan por accidente dentro de una palabra en español)
+  const frasesEN = ["thank you", "your name", "tell me", "divided by", "square root",
+    "can you", "do you", "what's", "are you", "how much", "how many",
+    "capital of", "capitals of"];
+  for (const f of frasesEN) {
+    if (texto.includes(f)) return "en";
+  }
+
+  return "es";
+}
+
+// Si el mensaje trae más de una pregunta ("¿cómo te llamas y qué hora
+// es?"), la separa para poder responder cada parte por separado.
+function dividirEnPreguntas(texto) {
+  // primero intenta separar por signos de interrogación
+  let partes = texto.split(/[?？]+/).map(p => p.trim()).filter(Boolean);
+  if (partes.length > 1) return partes;
+
+  // si no hay varios "?", separa por " y "/" and " solo si ambos lados
+  // parecen preguntas independientes (cada uno trae una palabra de pregunta)
+  const palabraPregunta = /\b(que|qué|cual|cuál|cuales|cuáles|cuanto|cuánto|cuantos|cuántos|quien|quién|como|cómo|donde|dónde|cuando|cuándo|dime|what|how|who|where|when|why|tell me)\b/i;
+  const posibles = texto.split(/\s+(?:y|and)\s+/i).map(p => p.trim()).filter(Boolean);
+  if (posibles.length > 1 && posibles.every(p => palabraPregunta.test(p))) {
+    return posibles;
+  }
+  return [texto];
+}
+
 // ---------------------------------------------------------------------
 // 4) INTENCIONES ESPECIALES (hora, fecha, capitales, matemáticas)
 // ---------------------------------------------------------------------
-function handleSpecialIntents(textoNormalizado) {
+function handleSpecialIntents(textoNormalizado, idioma) {
+  idioma = idioma || "es";
+  const EN = idioma === "en";
+
   // Hora
-  if (textoNormalizado.includes("que hora es") || textoNormalizado.includes("dime la hora")) {
+  if (textoNormalizado.includes("que hora es") || textoNormalizado.includes("dime la hora") ||
+      textoNormalizado.includes("what time is it") || textoNormalizado.includes("what's the time")) {
     const ahora = new Date();
     const hh = ahora.getHours().toString().padStart(2, "0");
     const mm = ahora.getMinutes().toString().padStart(2, "0");
-    return `Son las ${hh}:${mm}.`;
+    return EN ? `It's ${hh}:${mm}.` : `Son las ${hh}:${mm}.`;
   }
 
   // Fecha
-  if (textoNormalizado.includes("que dia es hoy") || textoNormalizado.includes("que fecha es hoy") || textoNormalizado.includes("en que fecha estamos")) {
+  if (textoNormalizado.includes("que dia es hoy") || textoNormalizado.includes("que fecha es hoy") ||
+      textoNormalizado.includes("en que fecha estamos") || textoNormalizado.includes("what day is it") ||
+      textoNormalizado.includes("today's date") || textoNormalizado.includes("what is the date")) {
     const ahora = new Date();
     const opciones = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-    return `Hoy es ${ahora.toLocaleDateString("es-ES", opciones)}.`;
+    return EN
+      ? `Today is ${ahora.toLocaleDateString("en-US", opciones)}.`
+      : `Hoy es ${ahora.toLocaleDateString("es-ES", opciones)}.`;
   }
 
-  // Capital de <país>
-  if (textoNormalizado.includes("capital de")) {
-    const pais = textoNormalizado.split("capital de")[1]?.trim();
-    if (pais) {
-      const paisLimpio = pais.replace(/^(el|la|los|las)\s/, "").trim();
-      if (CAPITALES[paisLimpio]) {
-        return `La capital de ${paisLimpio} es ${CAPITALES[paisLimpio]}.`;
+  // Raíz cuadrada de un número
+  const matchRaiz = textoNormalizado.match(/(?:raiz cuadrada de|square root of)\s*(-?\d+(?:[.,]\d+)*)/);
+  if (matchRaiz) {
+    const num = limpiarNumero(matchRaiz[1]);
+    if (Number.isNaN(num)) return EN ? "I couldn't read that number." : "No logré leer ese número.";
+    if (num < 0) return EN ? "I can't calculate the square root of a negative number." : "No puedo calcular la raíz cuadrada de un número negativo.";
+    const resultado = Math.round(Math.sqrt(num) * 1e6) / 1e6;
+    return EN ? `The square root of ${num} is ${resultado}.` : `La raíz cuadrada de ${num} es ${resultado}.`;
+  }
+
+  // Problema de viaje: hora de salida/llegada según duración, o distancia según velocidad
+  const respViaje = manejarProblemaViaje(textoNormalizado, idioma);
+  if (respViaje) return respViaje;
+
+  // N capitales de un continente (ej. "dime 5 capitales de asia")
+  const respRegion = manejarCapitalesRegion(textoNormalizado, idioma);
+  if (respRegion) return respRegion;
+
+  // Capital de <país> / capital of <country>
+  const trigCapital = EN ? "capital of" : "capital de";
+  if (textoNormalizado.includes(trigCapital)) {
+    const paisTxt = textoNormalizado.split(trigCapital)[1]?.trim();
+    if (paisTxt) {
+      const paisLimpio = paisTxt.replace(/^(el|la|los|las|the)\s/, "").trim();
+      const dict = EN ? CAPITALES_EN : CAPITALES;
+      if (dict[paisLimpio]) {
+        return EN
+          ? `The capital of ${paisLimpio} is ${dict[paisLimpio]}.`
+          : `La capital de ${paisLimpio} es ${dict[paisLimpio]}.`;
       }
-      return `No tengo guardada la capital de "${paisLimpio}", pero puedes agregarla en el objeto CAPITALES del código.`;
+      return EN
+        ? `I don't have the capital of "${paisLimpio}" saved, but you can add it to the CAPITALES_EN object in the code.`
+        : `No tengo guardada la capital de "${paisLimpio}", pero puedes agregarla en el objeto CAPITALES del código.`;
     }
   }
 
-  // Matemáticas: funciona con frase ("cuanto es 5 mas 3", "calcula 10 por 2")
+  // Matemáticas: funciona con frase ("cuanto es 5 mas 3" / "how much is 5 plus 3")
   // y también si se escribe la operación directamente ("34+56", "10 x 2")
   let expresion = textoNormalizado
-    .replace(/mas/g, "+")
-    .replace(/menos/g, "-")
-    .replace(/dividido|entre/g, "/")
-    .replace(/por/g, "*")
+    .replace(/mas|plus/g, "+")
+    .replace(/menos|minus/g, "-")
+    .replace(/dividido|entre|divided by/g, "/")
+    .replace(/por|times/g, "*")
     .replace(/[x×]/g, "*")
     .replace(/÷/g, "/");
 
@@ -779,7 +1042,9 @@ function handleSpecialIntents(textoNormalizado) {
   const regexOperacion = new RegExp(`(${patronNumero})\\s*([\\+\\-\\*\\/])\\s*(${patronNumero})`);
   const regexExpresionCompleta = new RegExp(`^${patronNumero}\\s*[\\+\\-\\*\\/]\\s*${patronNumero}$`);
 
-  const esConsultaExplicita = /cuanto (es|son|da)|calcula/.test(textoNormalizado);
+  const esConsultaExplicita = EN
+    ? /how much is|what's the result of|calculate/.test(textoNormalizado)
+    : /cuanto (es|son|da)|calcula/.test(textoNormalizado);
   const esOperacionDirecta = regexExpresionCompleta.test(expresion.trim());
 
   if (esConsultaExplicita || esOperacionDirecta) {
@@ -790,7 +1055,7 @@ function handleSpecialIntents(textoNormalizado) {
       const b = limpiarNumero(match[3]);
 
       if (Number.isNaN(a) || Number.isNaN(b)) {
-        return "No logré leer bien esos números. ¿Puedes repetirlos?";
+        return EN ? "I couldn't read those numbers. Can you repeat them?" : "No logré leer bien esos números. ¿Puedes repetirlos?";
       }
 
       let resultado;
@@ -799,32 +1064,126 @@ function handleSpecialIntents(textoNormalizado) {
       else if (op === "*") resultado = a * b;
       else if (op === "/") resultado = b !== 0 ? a / b : null;
 
-      if (resultado === null) return "No puedo dividir entre cero.";
+      if (resultado === null) return EN ? "I can't divide by zero." : "No puedo dividir entre cero.";
       // redondea a máximo 6 decimales para evitar errores de coma flotante
       resultado = Math.round(resultado * 1e6) / 1e6;
-      return `El resultado es ${resultado}.`;
+      return EN ? `The result is ${resultado}.` : `El resultado es ${resultado}.`;
     }
     if (esConsultaExplicita) {
-      return "Dime la operación con dos números, por ejemplo: '¿cuánto es 8 más 4?'";
+      return EN ? "Give me the operation with two numbers, for example: 'how much is 8 plus 4?'" : "Dime la operación con dos números, por ejemplo: '¿cuánto es 8 más 4?'";
     }
   }
 
   return null;
 }
 
+// "Dime 5 capitales de Asia" / "tell me 5 capitals of Asia"
+function manejarCapitalesRegion(texto, idioma) {
+  if (!texto.includes("capital")) return null;
+  const EN = idioma === "en";
+  const regiones = EN ? CAPITALES_POR_REGION_EN : CAPITALES_POR_REGION;
+  const nombres = EN ? REGION_NAME_EN : NOMBRE_REGION;
+  const clave = Object.keys(regiones).find(r => texto.includes(r));
+  if (!clave) return null;
+
+  const datos = regiones[clave];
+  const matchNum = texto.match(/\d+/);
+  let n = matchNum ? parseInt(matchNum[0], 10) : 5;
+  n = Math.max(1, Math.min(n, datos.length));
+
+  const mezclado = [...datos].sort(() => Math.random() - 0.5).slice(0, n);
+  if (EN) {
+    const lista = mezclado.map(x => `${x.country}: ${x.capital}`).join(", ");
+    return `Here are ${n} capitals of ${nombres[clave]}: ${lista}.`;
+  }
+  const lista = mezclado.map(x => `${x.pais}: ${x.capital}`).join(", ");
+  return `Aquí tienes ${n} capitales de ${nombres[clave]}: ${lista}.`;
+}
+
+// Problemas de "en X horas, ¿a qué hora salió/llegó?" y de velocidad/distancia.
+// IMPORTANTE: como no hay una hora de referencia fija en la pregunta, se
+// asume que "ahora" es el momento de llegada (para calcular la salida) o
+// el momento de salida (para calcular la llegada). Esto se aclara en la
+// respuesta para que quede claro que es un supuesto, no un dato inventado.
+function manejarProblemaViaje(texto, idioma) {
+  const EN = idioma === "en";
+  const matchHoras = texto.match(/(\d+(?:[.,]\d+)?)\s*(?:horas?|hours?|hrs?)\b/);
+  const matchMin = texto.match(/(\d+)\s*(?:minutos?|minutes?|min)\b/);
+  if (!matchHoras && !matchMin) return null;
+
+  const horas = matchHoras ? limpiarNumero(matchHoras[1]) : 0;
+  const minutos = matchMin ? parseInt(matchMin[1], 10) : 0;
+  if (!horas && !minutos) return null;
+
+  const msTotal = (horas * 60 + minutos) * 60 * 1000;
+  const duracionTxt = formatearDuracion(horas, minutos, idioma);
+
+  const preguntaSalida = /a que hora (sali|salio|salgo)|what time (did|do|does).*(leave|depart)/;
+  const preguntaLlegada = /a que hora (llego|llega|llegare|llegara)|what time (will|does).*arrive/;
+
+  if (preguntaSalida.test(texto)) {
+    const salida = new Date(Date.now() - msTotal);
+    const hh = salida.getHours().toString().padStart(2, "0");
+    const mm = salida.getMinutes().toString().padStart(2, "0");
+    return EN
+      ? `Assuming you're arriving right now after a ${duracionTxt} trip, you left at approximately ${hh}:${mm}.`
+      : `Suponiendo que llegas justo ahora después de un viaje de ${duracionTxt}, saliste aproximadamente a las ${hh}:${mm}.`;
+  }
+
+  if (preguntaLlegada.test(texto)) {
+    const llegada = new Date(Date.now() + msTotal);
+    const hh = llegada.getHours().toString().padStart(2, "0");
+    const mm = llegada.getMinutes().toString().padStart(2, "0");
+    return EN
+      ? `Assuming you're leaving right now on a ${duracionTxt} trip, you'll arrive at approximately ${hh}:${mm}.`
+      : `Suponiendo que sales justo ahora en un viaje de ${duracionTxt}, llegarías aproximadamente a las ${hh}:${mm}.`;
+  }
+
+  // Si además menciona velocidad y pregunta por la distancia (MRU: distancia = velocidad × tiempo)
+  const matchVelocidad = texto.match(/(\d+(?:[.,]\d+)?)\s*(?:km\/?h|kilometros por hora|kmh|km per hour|mph)/);
+  const preguntaDistancia = /distancia|recorrio|recorrido|cuantos km|distance|how far|how many km/;
+  if (matchVelocidad && preguntaDistancia.test(texto)) {
+    const velocidad = limpiarNumero(matchVelocidad[1]);
+    const tiempoHoras = horas + minutos / 60;
+    const distancia = Math.round(velocidad * tiempoHoras * 100) / 100;
+    return EN
+      ? `At ${velocidad} km/h for ${duracionTxt}, you would travel ${distancia} km.`
+      : `A ${velocidad} km/h durante ${duracionTxt}, recorrerías ${distancia} km.`;
+  }
+
+  return null;
+}
+
+function formatearDuracion(horas, minutos, idioma) {
+  const h = Math.floor(horas);
+  const partes = [];
+  if (idioma === "en") {
+    if (h > 0) partes.push(`${h} hour${h !== 1 ? "s" : ""}`);
+    if (minutos > 0) partes.push(`${minutos} minute${minutos !== 1 ? "s" : ""}`);
+    return partes.join(" and ") || "0 minutes";
+  }
+  if (h > 0) partes.push(`${h} hora${h !== 1 ? "s" : ""}`);
+  if (minutos > 0) partes.push(`${minutos} minuto${minutos !== 1 ? "s" : ""}`);
+  return partes.join(" y ") || "0 minutos";
+}
+
 // ---------------------------------------------------------------------
 // 5) MOTOR DE COINCIDENCIA POR PALABRAS CLAVE
 // ---------------------------------------------------------------------
-function buscarRespuesta(textoUsuario) {
+function buscarRespuesta(textoUsuario, idiomaForzado) {
+  const idioma = idiomaForzado || detectarIdioma(textoUsuario);
   const texto = normalizar(textoUsuario);
 
-  const especial = handleSpecialIntents(texto);
+  const especial = handleSpecialIntents(texto, idioma);
   if (especial) return especial;
+
+  const base = idioma === "en" ? KB_EN : KB;
+  const sinCoincidencia = idioma === "en" ? RESPUESTAS_SIN_COINCIDENCIA_EN : RESPUESTAS_SIN_COINCIDENCIA;
 
   let mejorEntrada = null;
   let mejorPuntaje = 0;
 
-  for (const entrada of KB) {
+  for (const entrada of base) {
     for (const frase of entrada.palabras) {
       if (texto.includes(frase)) {
         const puntaje = frase.split(" ").length; // frases más largas y específicas pesan más
@@ -840,7 +1199,7 @@ function buscarRespuesta(textoUsuario) {
     return elegirAlAzar(mejorEntrada.respuestas);
   }
 
-  return elegirAlAzar(RESPUESTAS_SIN_COINCIDENCIA);
+  return elegirAlAzar(sinCoincidencia);
 }
 
 // ---------------------------------------------------------------------
@@ -858,6 +1217,8 @@ const eyeL = document.getElementById("eyeL");
 const eyeR = document.getElementById("eyeR");
 const voicePill = document.getElementById("voicePill");
 const voicePillText = document.getElementById("voicePillText");
+const langPill = document.getElementById("langPill");
+let idiomaReconocimiento = "es"; // 'es' o 'en': controla en qué idioma escucha el micrófono
 const startOverlay = document.getElementById("startOverlay");
 const startBtn = document.getElementById("startBtn");
 
@@ -910,29 +1271,33 @@ function detenerAnimacionBoca() {
 // 7) SÍNTESIS DE VOZ (habla)
 // ---------------------------------------------------------------------
 let vozEspanol = null;
+let vozIngles = null;
 function cargarVoces() {
   const voces = window.speechSynthesis.getVoices();
   vozEspanol = voces.find(v => v.lang && v.lang.toLowerCase().startsWith("es")) || voces[0] || null;
+  vozIngles = voces.find(v => v.lang && v.lang.toLowerCase().startsWith("en")) || voces[0] || null;
 }
 if ("speechSynthesis" in window) {
   cargarVoces();
   window.speechSynthesis.onvoiceschanged = cargarVoces;
 }
 
-function hablar(texto) {
+function hablar(texto, idioma) {
+  idioma = idioma || "es";
   if (!("speechSynthesis" in window)) {
     setStatus("Este navegador no soporta voz de salida.");
     return;
   }
   window.speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(texto);
-  utter.lang = CONFIG.idiomaVoz;
+  utter.lang = idioma === "en" ? "en-US" : CONFIG.idiomaVoz;
   utter.rate = CONFIG.velocidadVoz;
   utter.pitch = CONFIG.tonoVoz;
-  if (vozEspanol) utter.voice = vozEspanol;
+  const voz = idioma === "en" ? vozIngles : vozEspanol;
+  if (voz) utter.voice = voz;
 
   utter.onstart = () => {
-    setStatus("Hablando...");
+    setStatus(idioma === "en" ? "Speaking..." : "Hablando...");
     iniciarAnimacionBoca();
   };
   utter.onend = () => {
@@ -1020,18 +1385,41 @@ micBtn.addEventListener("click", () => {
   }
 });
 
+// El reconocimiento de voz del navegador solo puede escuchar en UN idioma
+// a la vez (no puede "adivinar" si vas a hablar en español o en inglés
+// antes de empezar a transcribir). Este botón deja elegir cuál.
+if (langPill) {
+  langPill.addEventListener("click", () => {
+    idiomaReconocimiento = idiomaReconocimiento === "es" ? "en" : "es";
+    langPill.textContent = idiomaReconocimiento === "es" ? "🌐 ES" : "🌐 EN";
+    if (recognition) recognition.lang = idiomaReconocimiento === "es" ? CONFIG.idiomaVoz : "en-US";
+    setStatus(idiomaReconocimiento === "es" ? "Reconocimiento en español." : "Voice recognition in English.");
+  });
+}
+
 // ---------------------------------------------------------------------
 // 9) FLUJO PRINCIPAL: pregunta -> respuesta
 // ---------------------------------------------------------------------
-function procesarPregunta(texto) {
-  if (!texto || !texto.trim()) return;
-  agregarBurbuja(texto, "user");
+function procesarPregunta(textoOriginal) {
+  if (!textoOriginal || !textoOriginal.trim()) return;
+  agregarBurbuja(textoOriginal, "user");
   setStatus("Pensando...");
 
   setTimeout(() => {
-    const respuesta = buscarRespuesta(texto);
-    agregarBurbuja(respuesta, "bot");
-    hablar(respuesta);
+    const idioma = detectarIdioma(textoOriginal);
+    const subPreguntas = dividirEnPreguntas(textoOriginal);
+
+    let respuestaFinal;
+    if (subPreguntas.length > 1) {
+      // hay más de una pregunta en el mismo mensaje: responde cada una
+      const respuestas = subPreguntas.map(p => buscarRespuesta(p, idioma));
+      respuestaFinal = respuestas.map((r, i) => `${i + 1}) ${r}`).join("  ");
+    } else {
+      respuestaFinal = buscarRespuesta(textoOriginal, idioma);
+    }
+
+    agregarBurbuja(respuestaFinal, "bot");
+    hablar(respuestaFinal, idioma);
   }, 350);
 }
 
@@ -1048,7 +1436,7 @@ textForm.addEventListener("submit", (e) => {
 startBtn.addEventListener("click", () => {
   startOverlay.style.display = "none";
   agregarBurbuja(CONFIG.saludoInicial, "bot");
-  hablar(CONFIG.saludoInicial);
+  hablar(CONFIG.saludoInicial, "es");
 });
 </script>
 </body>
