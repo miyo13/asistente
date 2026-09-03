@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Nova · Asistente Virtual</title>
+<title>DSV bot · Asistente Virtual</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -298,7 +298,7 @@
         </svg>
       </div>
     </div>
-    <h1>Hola, soy Nova</h1>
+    <h1>Hola, soy DSV bot</h1>
     <p>Tu asistente virtual. Puedo escucharte y responderte por voz. Toca el botón para comenzar.</p>
     <button class="start-btn" id="startBtn">Comenzar</button>
   </div>
@@ -306,7 +306,7 @@
   <div class="app">
     <header>
       <div class="brand">
-        <span class="name">Nova</span>
+        <span class="name">DSV bot</span>
         <span class="tag">Asistente</span>
       </div>
       <div class="pill" id="voicePill"><span class="dot"></span><span id="voicePillText">Voz lista</span></div>
@@ -352,7 +352,7 @@
 
 <script>
 /* =========================================================================
-   NOVA — Asistente virtual 100% local (sin API keys, sin servicios de pago)
+   DSV bot — Asistente virtual 100% local (sin API keys, sin servicios de pago)
    -------------------------------------------------------------------------
    - Reconocimiento de voz: Web Speech API (SpeechRecognition), integrada
      en el navegador. Funciona bien en Chrome/Edge en Android/Windows/Mac.
@@ -380,6 +380,7 @@ const CONFIG = {
   tonoVoz: 1.05,            // 0 (grave) a 2 (agudo)
   saludoInicial: "¡Hola! Soy DSV bot, tu asistente. Puedes preguntarme cosas o pedirme que te ayude. ¿En qué te ayudo hoy?"
 };
+
 // ---------------------------------------------------------------------
 // 2) BASE DE CONOCIMIENTO — agrega tantas entradas como quieras.
 //    "palabras" = términos que, si aparecen en la pregunta, activan esta
@@ -397,7 +398,7 @@ const KB = [
   },
   {
     palabras: ["como te llamas", "cual es tu nombre", "quien eres", "tu nombre"],
-    respuestas: [Me llamo ${CONFIG.nombre}. Soy un asistente virtual creado para escucharte y ayudarte.]
+    respuestas: [`Me llamo ${CONFIG.nombre}. Soy un asistente virtual creado para escucharte y ayudarte.`]
   },
   {
     palabras: ["quien te creo", "quien te construyo", "quien te programo", "quien te hizo"],
@@ -405,7 +406,7 @@ const KB = [
   },
   {
     palabras: ["que puedes hacer", "que sabes hacer", "para que sirves", "ayuda", "que haces"],
-    respuestas: ["Puedo saludarte, contar chistes, hacer cuentas sencillas, decirte capitales de países y conversar sobre temas básicos. ¡Pregúntame algo!"]
+    respuestas: ["Puedo saludarte, contar chistes, hacer cuentas sencillas, decirte capitales de países, hablar de robótica y Python, y conversar sobre temas básicos. ¡Pregúntame algo!"]
   },
   {
     palabras: ["chiste", "cuentame algo gracioso", "hazme reir"],
@@ -438,6 +439,72 @@ const KB = [
   {
     palabras: ["cuanto es", "cuanto son", "calcula", "cuanto da"],
     respuestas: []
+  },
+
+  // ---- BLOQUE ROBÓTICA, PYTHON Y TECNOLOGÍA (currículo GCF) ----
+  {
+    palabras: ["que es un robot", "que es robot"],
+    respuestas: ["Un robot es una máquina que puede percibir su entorno con sensores, tomar decisiones con un programa y actuar sobre el mundo con motores u otras partes móviles."]
+  },
+  {
+    palabras: ["que es la robotica", "que es robotica"],
+    respuestas: ["La robótica es el área que estudia cómo diseñar, construir y programar robots, mezclando mecánica, electrónica y programación."]
+  },
+  {
+    palabras: ["que es un sensor"],
+    respuestas: ["Un sensor es un componente que detecta información del entorno, como luz, distancia, temperatura o sonido, y la convierte en una señal que el robot puede entender."]
+  },
+  {
+    palabras: ["que es un actuador"],
+    respuestas: ["Un actuador es la parte del robot que produce movimiento o acción, como un motor, un servomotor o un altavoz. Es lo opuesto al sensor: el sensor percibe, el actuador actúa."]
+  },
+  {
+    palabras: ["que es un algoritmo"],
+    respuestas: ["Un algoritmo es una secuencia ordenada de pasos para resolver un problema o cumplir una tarea, como una receta de cocina pero para una computadora."]
+  },
+  {
+    palabras: ["que es python"],
+    respuestas: ["Python es un lenguaje de programación fácil de leer, muy usado para aprender a programar, hacer ciencia de datos e inteligencia artificial."]
+  },
+  {
+    palabras: ["quien invento python", "quien creo python"],
+    respuestas: ["Python fue creado por Guido van Rossum y se publicó por primera vez en 1991."]
+  },
+  {
+    palabras: ["que es una variable"],
+    respuestas: ["En programación, una variable es un espacio con nombre donde se guarda un dato, como un número o un texto, para poder usarlo o cambiarlo más adelante."]
+  },
+  {
+    palabras: ["que es un bucle", "que es un ciclo", "que es un for", "que es un while"],
+    respuestas: ["Un bucle (o ciclo) es una estructura que repite un bloque de instrucciones varias veces, en vez de escribirlas una y otra vez."]
+  },
+  {
+    palabras: ["que es una condicional", "que es un si entonces", "que es un if"],
+    respuestas: ["Una condicional es una instrucción que permite que el programa tome decisiones: 'si se cumple esto, entonces haz esto otro; si no, haz otra cosa'."]
+  },
+  {
+    palabras: ["que es una funcion"],
+    respuestas: ["En programación, una función es un bloque de código con un nombre que realiza una tarea específica y se puede reutilizar cuando lo necesites."]
+  },
+  {
+    palabras: ["que es el hardware"],
+    respuestas: ["El hardware es la parte física de un computador o robot: los cables, chips, motores y sensores que puedes tocar."]
+  },
+  {
+    palabras: ["que es el software"],
+    respuestas: ["El software son los programas e instrucciones que le dicen al hardware qué hacer. No lo puedes tocar, pero sí lo puedes ver en la pantalla."]
+  },
+  {
+    palabras: ["que es un microcontrolador", "que es arduino", "que es un esp32"],
+    respuestas: ["Un microcontrolador, como Arduino o el ESP32, es un pequeño computador dentro de un chip que se usa para controlar sensores y motores en proyectos de robótica."]
+  },
+  {
+    palabras: ["que es la inteligencia artificial", "que es ia"],
+    respuestas: ["La inteligencia artificial es un área de la tecnología que crea programas capaces de aprender de datos y tomar decisiones, imitando algunas capacidades humanas como reconocer imágenes o entender el lenguaje."]
+  },
+  {
+    palabras: ["que es un bit", "que es un byte"],
+    respuestas: ["Un bit es la unidad más pequeña de información en una computadora: solo puede ser 0 o 1. Un byte son 8 bits juntos, suficientes para representar, por ejemplo, una letra."]
   }
 ];
 
@@ -495,14 +562,14 @@ function handleSpecialIntents(textoNormalizado) {
     const ahora = new Date();
     const hh = ahora.getHours().toString().padStart(2, "0");
     const mm = ahora.getMinutes().toString().padStart(2, "0");
-    return Son las ${hh}:${mm}.;
+    return `Son las ${hh}:${mm}.`;
   }
 
   // Fecha
   if (textoNormalizado.includes("que dia es hoy") || textoNormalizado.includes("que fecha es hoy") || textoNormalizado.includes("en que fecha estamos")) {
     const ahora = new Date();
     const opciones = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-    return Hoy es ${ahora.toLocaleDateString("es-ES", opciones)}.;
+    return `Hoy es ${ahora.toLocaleDateString("es-ES", opciones)}.`;
   }
 
   // Capital de <país>
@@ -511,9 +578,9 @@ function handleSpecialIntents(textoNormalizado) {
     if (pais) {
       const paisLimpio = pais.replace(/^(el|la|los|las)\s/, "").trim();
       if (CAPITALES[paisLimpio]) {
-        return La capital de ${paisLimpio} es ${CAPITALES[paisLimpio]}.;
+        return `La capital de ${paisLimpio} es ${CAPITALES[paisLimpio]}.`;
       }
-      return No tengo guardada la capital de "${paisLimpio}", pero puedes agregarla en el objeto CAPITALES del código.;
+      return `No tengo guardada la capital de "${paisLimpio}", pero puedes agregarla en el objeto CAPITALES del código.`;
     }
   }
 
@@ -524,7 +591,7 @@ function handleSpecialIntents(textoNormalizado) {
       .replace(/menos/g, "-")
       .replace(/por/g, "*")
       .replace(/entre|dividido/g, "/");
-    const match = expresion.match(/(-?\d+(?:\.\d+)?)\s*([\+\-\\/])\s(-?\d+(?:\.\d+)?)/);
+    const match = expresion.match(/(-?\d+(?:\.\d+)?)\s*([\+\-\*\/])\s*(-?\d+(?:\.\d+)?)/);
     if (match) {
       const a = parseFloat(match[1]);
       const op = match[2];
@@ -536,7 +603,7 @@ function handleSpecialIntents(textoNormalizado) {
       else if (op === "/") resultado = b !== 0 ? a / b : null;
 
       if (resultado === null) return "No puedo dividir entre cero.";
-      return El resultado es ${resultado}.;
+      return `El resultado es ${resultado}.`;
     }
     return "Dime la operación con dos números, por ejemplo: '¿cuánto es 8 más 4?'";
   }
