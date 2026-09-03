@@ -374,13 +374,12 @@
 // 1) CONFIGURACIÓN — edita esto para personalizar el asistente
 // ---------------------------------------------------------------------
 const CONFIG = {
-  nombre: "Nova",
+  nombre: "DSV bot",
   idiomaVoz: "es-CO",       // idioma para escuchar y hablar
   velocidadVoz: 1.0,        // 0.5 (lento) a 1.5 (rápido)
   tonoVoz: 1.05,            // 0 (grave) a 2 (agudo)
-  saludoInicial: "¡Hola! Soy Nova, tu asistente. Puedes preguntarme cosas o pedirme que te ayude. ¿En qué te ayudo hoy?"
+  saludoInicial: "¡Hola! Soy DSV bot, tu asistente. Puedes preguntarme cosas o pedirme que te ayude. ¿En qué te ayudo hoy?"
 };
-
 // ---------------------------------------------------------------------
 // 2) BASE DE CONOCIMIENTO — agrega tantas entradas como quieras.
 //    "palabras" = términos que, si aparecen en la pregunta, activan esta
@@ -398,11 +397,11 @@ const KB = [
   },
   {
     palabras: ["como te llamas", "cual es tu nombre", "quien eres", "tu nombre"],
-    respuestas: [`Me llamo ${CONFIG.nombre}. Soy un asistente virtual creado para escucharte y ayudarte.`]
+    respuestas: [Me llamo ${CONFIG.nombre}. Soy un asistente virtual creado para escucharte y ayudarte.]
   },
   {
     palabras: ["quien te creo", "quien te construyo", "quien te programo", "quien te hizo"],
-    respuestas: ["Fui creado con código HTML, CSS y JavaScript, usando las herramientas de voz del navegador."]
+    respuestas: ["Fui creado por Sofia Meneses, Victoria Mancera y Dana Casallas."]
   },
   {
     palabras: ["que puedes hacer", "que sabes hacer", "para que sirves", "ayuda", "que haces"],
@@ -496,14 +495,14 @@ function handleSpecialIntents(textoNormalizado) {
     const ahora = new Date();
     const hh = ahora.getHours().toString().padStart(2, "0");
     const mm = ahora.getMinutes().toString().padStart(2, "0");
-    return `Son las ${hh}:${mm}.`;
+    return Son las ${hh}:${mm}.;
   }
 
   // Fecha
   if (textoNormalizado.includes("que dia es hoy") || textoNormalizado.includes("que fecha es hoy") || textoNormalizado.includes("en que fecha estamos")) {
     const ahora = new Date();
     const opciones = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-    return `Hoy es ${ahora.toLocaleDateString("es-ES", opciones)}.`;
+    return Hoy es ${ahora.toLocaleDateString("es-ES", opciones)}.;
   }
 
   // Capital de <país>
@@ -512,9 +511,9 @@ function handleSpecialIntents(textoNormalizado) {
     if (pais) {
       const paisLimpio = pais.replace(/^(el|la|los|las)\s/, "").trim();
       if (CAPITALES[paisLimpio]) {
-        return `La capital de ${paisLimpio} es ${CAPITALES[paisLimpio]}.`;
+        return La capital de ${paisLimpio} es ${CAPITALES[paisLimpio]}.;
       }
-      return `No tengo guardada la capital de "${paisLimpio}", pero puedes agregarla en el objeto CAPITALES del código.`;
+      return No tengo guardada la capital de "${paisLimpio}", pero puedes agregarla en el objeto CAPITALES del código.;
     }
   }
 
@@ -525,7 +524,7 @@ function handleSpecialIntents(textoNormalizado) {
       .replace(/menos/g, "-")
       .replace(/por/g, "*")
       .replace(/entre|dividido/g, "/");
-    const match = expresion.match(/(-?\d+(?:\.\d+)?)\s*([\+\-\*\/])\s*(-?\d+(?:\.\d+)?)/);
+    const match = expresion.match(/(-?\d+(?:\.\d+)?)\s*([\+\-\\/])\s(-?\d+(?:\.\d+)?)/);
     if (match) {
       const a = parseFloat(match[1]);
       const op = match[2];
@@ -537,7 +536,7 @@ function handleSpecialIntents(textoNormalizado) {
       else if (op === "/") resultado = b !== 0 ? a / b : null;
 
       if (resultado === null) return "No puedo dividir entre cero.";
-      return `El resultado es ${resultado}.`;
+      return El resultado es ${resultado}.;
     }
     return "Dime la operación con dos números, por ejemplo: '¿cuánto es 8 más 4?'";
   }
