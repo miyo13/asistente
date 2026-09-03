@@ -545,12 +545,37 @@ function normalizar(texto) {
   return texto
     .toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // quita tildes
-    .replace(/[¿?¡!.,]/g, "")
-    .trim();
+    .replace(/[¿?¡!]/g, "")   // quita signos de interrogación/exclamación
+    .replace(/[.,]+$/g, "")   // quita solo el punto/coma AL FINAL de la frase
+    .trim();                  // (así no se pierden los puntos/comas decimales)
 }
 
 function elegirAlAzar(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// Convierte un texto numérico (con posibles separadores de miles y un
+// separador decimal en "." o ",") a un número real de JavaScript.
+// Ej: "1.234.567,89" -> 1234567.89   |  "3,5" -> 3.5   |  "1200" -> 1200
+function limpiarNumero(token) {
+  const tieneComa = token.includes(",");
+  const tienePunto = token.includes(".");
+
+  if (tieneComa) {
+    // la coma es el separador decimal (convención en Colombia/España);
+    // cualquier punto presente se interpreta como separador de miles
+    return parseFloat(token.replace(/\./g, "").replace(",", "."));
+  }
+  if (tienePunto) {
+    const cantidadPuntos = (token.match(/\./g) || []).length;
+    if (cantidadPuntos > 1) {
+      // varios puntos: todos son separadores de miles (ej. 1.250.000)
+      return parseFloat(token.replace(/\./g, ""));
+    }
+    // un solo punto: se interpreta como separador decimal (ej. 3.5)
+    return parseFloat(token);
+  }
+  return parseFloat(token);
 }
 
 // ---------------------------------------------------------------------
@@ -584,18 +609,30 @@ function handleSpecialIntents(textoNormalizado) {
     }
   }
 
-  // Matemáticas simples: "cuanto es 5 mas 3", "cuanto es 10 por 2"
+  // Matemáticas: "cuanto es 5 mas 3", "cuanto es 1.250,5 por 2", "cuanto es 3000000 entre 4"
   if (/cuanto (es|son|da)|calcula/.test(textoNormalizado)) {
     let expresion = textoNormalizado
       .replace(/mas/g, "+")
       .replace(/menos/g, "-")
       .replace(/por/g, "*")
       .replace(/entre|dividido/g, "/");
-    const match = expresion.match(/(-?\d+(?:\.\d+)?)\s*([\+\-\*\/])\s*(-?\d+(?:\.\d+)?)/);
+
+    // acepta enteros o decimales de CUALQUIER tamaño, con "." o "," como
+    // separador. Si un número trae varios separadores (ej 1.234.567,89),
+    // el último se interpreta como decimal y los anteriores como miles.
+    const patronNumero = "-?\\d+(?:[.,]\\d+)*";
+    const regexOperacion = new RegExp(`(${patronNumero})\\s*([\\+\\-\\*\\/])\\s*(${patronNumero})`);
+    const match = expresion.match(regexOperacion);
+
     if (match) {
-      const a = parseFloat(match[1]);
+      const a = limpiarNumero(match[1]);
       const op = match[2];
-      const b = parseFloat(match[3]);
+      const b = limpiarNumero(match[3]);
+
+      if (Number.isNaN(a) || Number.isNaN(b)) {
+        return "No logré leer bien esos números. ¿Puedes repetirlos?";
+      }
+
       let resultado;
       if (op === "+") resultado = a + b;
       else if (op === "-") resultado = a - b;
@@ -603,6 +640,8 @@ function handleSpecialIntents(textoNormalizado) {
       else if (op === "/") resultado = b !== 0 ? a / b : null;
 
       if (resultado === null) return "No puedo dividir entre cero.";
+      // redondea a máximo 6 decimales para evitar errores de coma flotante
+      resultado = Math.round(resultado * 1e6) / 1e6;
       return `El resultado es ${resultado}.`;
     }
     return "Dime la operación con dos números, por ejemplo: '¿cuánto es 8 más 4?'";
