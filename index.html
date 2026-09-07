@@ -131,8 +131,8 @@
   }
   svg#face{width:80%;height:80%;}
   #eyeL, #eyeR{ transform-box:fill-box; transform-origin:center; transition:transform .09s ease; }
-  .mouth{ stroke:var(--cyan); stroke-linecap:round; fill:none; }
-  .whisker{ stroke:var(--cyan); stroke-width:1.6; stroke-linecap:round; opacity:0.5; fill:none; }
+  .mouth{ stroke:#8a94a0; stroke-linecap:round; fill:none; }
+  .whisker{ stroke:#c7ced4; stroke-width:1.6; stroke-linecap:round; opacity:0.7; fill:none; }
 
   .status-label{
     text-align:center;
@@ -295,26 +295,26 @@
         <svg viewBox="0 0 200 200" style="width:80%;height:80%;">
           <defs>
             <linearGradient id="headGrad-m" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#8ff3ff"/>
-              <stop offset="55%" stop-color="#4fe3ff"/>
-              <stop offset="100%" stop-color="#1c93b3"/>
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="55%" stop-color="#eef1f4"/>
+              <stop offset="100%" stop-color="#c4ccd4"/>
             </linearGradient>
             <linearGradient id="earGrad-m" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#4fe3ff"/>
-              <stop offset="100%" stop-color="#1c93b3"/>
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="100%" stop-color="#b9c2cb"/>
             </linearGradient>
             <linearGradient id="innerEarGrad-m" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#d9ccff"/>
-              <stop offset="100%" stop-color="#8b7bff"/>
+              <stop offset="0%" stop-color="#ffd6e8"/>
+              <stop offset="100%" stop-color="#ff8fc1"/>
             </linearGradient>
             <radialGradient id="irisGrad-m" cx="35%" cy="30%" r="75%">
-              <stop offset="0%" stop-color="#eafeff"/>
-              <stop offset="45%" stop-color="#8ff3ff"/>
-              <stop offset="100%" stop-color="#1c93b3"/>
+              <stop offset="0%" stop-color="#eafff0"/>
+              <stop offset="45%" stop-color="#4ade80"/>
+              <stop offset="100%" stop-color="#15803d"/>
             </radialGradient>
             <linearGradient id="noseGrad-m" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#d9ccff"/>
-              <stop offset="100%" stop-color="#8b7bff"/>
+              <stop offset="0%" stop-color="#ffd6e8"/>
+              <stop offset="100%" stop-color="#ff8fc1"/>
             </linearGradient>
             <radialGradient id="muzzleShade-m" cx="50%" cy="0%" r="75%">
               <stop offset="0%" stop-color="#04121a" stop-opacity="0.22"/>
@@ -339,8 +339,8 @@
 
             <ellipse cx="100" cy="150" rx="46" ry="26" fill="url(#muzzleShade-m)"/>
 
-            <ellipse cx="48" cy="128" rx="13" ry="8" fill="#8b7bff" opacity="0.18"/>
-            <ellipse cx="152" cy="128" rx="13" ry="8" fill="#8b7bff" opacity="0.18"/>
+            <ellipse cx="48" cy="128" rx="13" ry="8" fill="#ff8fc1" opacity="0.16"/>
+            <ellipse cx="152" cy="128" rx="13" ry="8" fill="#ff8fc1" opacity="0.16"/>
 
             <path class="whisker" d="M 40 122 Q 15 116 6 108"/>
             <path class="whisker" d="M 38 132 Q 10 130 2 130"/>
@@ -362,7 +362,7 @@
             <circle cx="136" cy="112" r="1.4" fill="#ffffff" opacity="0.7"/>
 
             <path fill="url(#noseGrad-m)" d="M 94 132 C 94 128 98 126 100 126 C 102 126 106 128 106 132 C 106 136 100 142 100 142 C 100 142 94 136 94 132 Z"/>
-            <line x1="100" y1="142" x2="100" y2="148" stroke="#8b7bff" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+            <line x1="100" y1="142" x2="100" y2="148" stroke="#e88fb0" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
 
             <path class="mouth" d="M 78 152 Q 89 162 100 152 Q 111 162 122 152" stroke-width="5"/>
           </g>
@@ -393,26 +393,26 @@
           <svg id="face" viewBox="0 0 200 200">
             <defs>
               <linearGradient id="headGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#8ff3ff"/>
-                <stop offset="55%" stop-color="#4fe3ff"/>
-                <stop offset="100%" stop-color="#1c93b3"/>
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="55%" stop-color="#eef1f4"/>
+                <stop offset="100%" stop-color="#c4ccd4"/>
               </linearGradient>
               <linearGradient id="earGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#4fe3ff"/>
-                <stop offset="100%" stop-color="#1c93b3"/>
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="100%" stop-color="#b9c2cb"/>
               </linearGradient>
               <linearGradient id="innerEarGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#d9ccff"/>
-                <stop offset="100%" stop-color="#8b7bff"/>
+                <stop offset="0%" stop-color="#ffd6e8"/>
+                <stop offset="100%" stop-color="#ff8fc1"/>
               </linearGradient>
               <radialGradient id="irisGrad" cx="35%" cy="30%" r="75%">
-                <stop offset="0%" stop-color="#eafeff"/>
-                <stop offset="45%" stop-color="#8ff3ff"/>
-                <stop offset="100%" stop-color="#1c93b3"/>
+                <stop offset="0%" stop-color="#eafff0"/>
+                <stop offset="45%" stop-color="#4ade80"/>
+                <stop offset="100%" stop-color="#15803d"/>
               </radialGradient>
               <linearGradient id="noseGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#d9ccff"/>
-                <stop offset="100%" stop-color="#8b7bff"/>
+                <stop offset="0%" stop-color="#ffd6e8"/>
+                <stop offset="100%" stop-color="#ff8fc1"/>
               </linearGradient>
               <radialGradient id="muzzleShade" cx="50%" cy="0%" r="75%">
                 <stop offset="0%" stop-color="#04121a" stop-opacity="0.22"/>
@@ -441,8 +441,8 @@
               <ellipse cx="100" cy="150" rx="46" ry="26" fill="url(#muzzleShade)"/>
 
               <!-- rubor en las mejillas -->
-              <ellipse cx="48" cy="128" rx="13" ry="8" fill="#8b7bff" opacity="0.18"/>
-              <ellipse cx="152" cy="128" rx="13" ry="8" fill="#8b7bff" opacity="0.18"/>
+              <ellipse cx="48" cy="128" rx="13" ry="8" fill="#ff8fc1" opacity="0.16"/>
+              <ellipse cx="152" cy="128" rx="13" ry="8" fill="#ff8fc1" opacity="0.16"/>
 
               <!-- bigotes -->
               <path class="whisker" d="M 40 122 Q 15 116 6 108"/>
@@ -470,7 +470,7 @@
 
               <!-- nariz -->
               <path fill="url(#noseGrad)" d="M 94 132 C 94 128 98 126 100 126 C 102 126 106 128 106 132 C 106 136 100 142 100 142 C 100 142 94 136 94 132 Z"/>
-              <line x1="100" y1="142" x2="100" y2="148" stroke="#8b7bff" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+              <line x1="100" y1="142" x2="100" y2="148" stroke="#e88fb0" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
 
               <!-- boca -->
               <path class="mouth" id="mouth" d="M 78 152 Q 89 162 100 152 Q 111 162 122 152" stroke-width="5"/>
